@@ -144,4 +144,36 @@ router.put("/update",authmiddleware, async (req, res) => {
     }
 })
 
+router.get("/bulk", async (req, res) => {
+    try {
+        const search = req.query.filter || "";
+
+        const users = await User.findOne({
+            $or: [{
+                firstName: {
+                    "$regex": search
+                }
+            }, {
+                lastName: {
+                    "$regex": search
+                }
+            }]
+        });
+
+        res.status(200).json({
+            user: users.map(user => ({
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                _id: user._id
+            }))
+        });
+
+    } catch(error) {
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+})
+
 module.exports = router;
