@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const zod = require("zod");
-const { User } = require("../db/db")
+const { User, Account } = require("../db/db")
 const jwt = require("jsonwebtoken");
 const { authmiddleware } = require("../middleware/middleware");
 require("dotenv").config()
@@ -52,6 +52,15 @@ router.post("/signup", async (req, res) => {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
         });
+
+        const userId = newUser._id;
+
+        // giving the random amount to user for transaction
+        await Account.create({
+            userId,
+            balance: 1 + Math.random() * 10000
+        })
+
         const token = jwt.sign({
             userid: newUser._id
         }, jwttoken);
