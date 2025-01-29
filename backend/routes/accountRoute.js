@@ -4,6 +4,12 @@ const { Account } = require("../db/db");
 const { default: mongoose } = require("mongoose");
 const router = express.Router();
 require("dotenv").config();
+const { z } = require("zod");
+
+const accountValid = z.object({
+    amount: z.number().positive("Amount must be a positive number"),
+    to: z.string().min(1, "Recipient user ID is required")
+});
 
 router.get("/balance", authmiddleware, async (req, res) => {
     const userId = req.userId;
@@ -20,9 +26,16 @@ router.post("/transfer", authmiddleware, async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
+        accountValid.parse(req.body);
+
         const {amount, to} = req.body;
 
         const userId = req.userId;
+
+        if (userId === to) {
+            await session.abortTransaction();
+            throw new Error("You cannot transfer money to yourself");
+        }
 
         const account = await Account.findOne({
             userId
@@ -69,11 +82,17 @@ router.post("/transfer", authmiddleware, async (req, res) => {
         });
     } catch(error) {
         session.abortTransaction();
+
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ message: error.errors.map(err => err.message).join(", ") });
+        }
+
         res.status(500).json({
             message: "Internal server error"
         });
     } finally {
         session.endSession();
     }
-
 });
+
+module.exports = router;
