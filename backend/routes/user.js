@@ -157,7 +157,7 @@ router.get("/bulk", async (req, res) => {
     try {
         const search = req.query.filter || "";
 
-        const users = await User.findOne({
+        const users = await User.find({
             $or: [{
                 firstName: {
                     "$regex": search
@@ -179,6 +179,7 @@ router.get("/bulk", async (req, res) => {
         });
 
     } catch(error) {
+        console.log(error);
         res.status(500).json({
             message: "Internal server error"
         });
