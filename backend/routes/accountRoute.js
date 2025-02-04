@@ -36,68 +36,39 @@ router.post("/transfer", authmiddleware, async (req, res) => {
     try {
         accountValid.parse(req.body);
 
-        const {amount, to} = req.body;
-
-        const userId = req.userId;
+        const { amount, to } = req.body;
+        const userId = req.userid;
 
         if (userId === to) {
-            await session.abortTransaction();
             throw new Error("You cannot transfer money to yourself");
         }
 
-        const account = await Account.findOne({
-            userId
-        }).session(session);
-
-        if(account.balance < amount) {
-            await session.abortTransaction();
-            return res.status(404).json({
-                message: "Insufficient balance"
-            });
+        const account = await Account.findOne({ userId }).session(session);
+        console.log(account);
+        if (!account || account.balance < amount) {
+            throw new Error("Insufficient balance");
         }
 
-        const isToAccount = await Account.findOne({
-            userId: to
-        }).session(session);
-
-        if(!isToAccount) {
-            await session.abortTransaction();
-            return res.status(404).json({
-                message: "Invalid userId"
-            });
+        const isToAccount = await Account.findOne({ userId: to }).session(session);
+        if (!isToAccount) {
+            throw new Error("Invalid userId");
         }
 
-        await Account.updateOne({
-            userId
-        }, {
-            $inc: {
-                balance: -amount
-            }
-        }).session(session);
-
-        await Account.updateOne({
-            userId: to
-        }, {
-            $inc: {
-                balance: amount
-            }
-        }).session(session);
+        await Account.updateOne({ userId }, { $inc: { balance: -amount } }).session(session);
+        await Account.updateOne({ userId: to }, { $inc: { balance: amount } }).session(session);
 
         await session.commitTransaction();
-
-        res.status(200).json({
-            message: "Transfer successful!"
-        });
-    } catch(error) {
-        session.abortTransaction();
+        res.status(200).json({ message: "Transfer successful!" });
+    } catch (error) {
+        if (session.inTransaction()) {
+            await session.abortTransaction();
+        }
 
         if (error instanceof z.ZodError) {
             return res.status(400).json({ message: error.errors.map(err => err.message).join(", ") });
         }
 
-        res.status(500).json({
-            message: "Internal server error"
-        });
+        res.status(500).json({ message: error.message || "Internal server error" });
     } finally {
         session.endSession();
     }

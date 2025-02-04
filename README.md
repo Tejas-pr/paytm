@@ -1,6 +1,16 @@
-# Build a basic version of PayTM
-[Question - click here](https://projects.100xdevs.com/tracks/oAjvkeRNZThPMxZf4aX5/L5aGnQuku8Az1CDNwGNQ) - step 14 - backend done!
+# Paytm Clone
 
-to do
-- hash password
-- zod validation to /transfer
+## Overview
+
+This project is a Paytm clone built using **Reactjs, Tailwindcss, Node.js, Express, and MongoDB with Mongoose**. The primary goal is to understand and implement **user-to-user transactions** using **MongoDB sessions** to ensure atomicity and consistency.
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Tejas-pr/paytm
+   ```
+
+## Thank You
+
+Thank you for checking out this project! Feel free to contribute or reach out with any suggestions. 🚀

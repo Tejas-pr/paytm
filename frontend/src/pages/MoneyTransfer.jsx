@@ -8,22 +8,36 @@ const MoneyTransfer = () => {
   const userId = searchParms.get("id");
   const name = searchParms.get("name");
   const [amount, setAmount] = useState();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleTransfer = async () => {
-    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/account/transfer`,{
-      to: userId,
-      amount: amount
-    }, {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("logToken")}`
-      }
-    });
-    if(response.data) {
-      alert("Money Transfered Successfully");
-      navigate("/dashboard");
+    setLoading(true);
+    try {
+        const response = await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/api/v1/account/transfer`,
+            {
+                to: userId,
+                amount: Number(amount),
+            },
+            {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("logToken")}`,
+                },
+            }
+        );
+
+        if (response.data) {
+            alert("Money Transferred to " + name + " Successfully");
+            navigate("/dashboard");
+        }
+    } catch (error) {
+        console.error("Transfer failed:", error);
+        alert(error.response?.data?.message || "Something went wrong. Please try again.");
+    } finally {
+        setLoading(false);
     }
-  }
+};
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">
@@ -58,7 +72,7 @@ const MoneyTransfer = () => {
           <button 
           onClick={handleTransfer}
           className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 hover:cursor-pointer">
-            Send <ArrowRight />
+            {loading ? "Transferring..." : <>Send <ArrowRight /></>}
           </button>
         </div>
       </div>

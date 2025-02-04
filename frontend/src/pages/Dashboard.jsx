@@ -11,6 +11,8 @@ const Dashboard = () => {
   const [filter, setFilter] = useState();
   const [balance, setBalance] = useState();
   const navigate = useNavigate();
+  const token = localStorage.getItem("logToken");
+
   const handleDashboarddata = async (filter = "") => {
     try {
       const response = await axios.get(
@@ -40,7 +42,11 @@ const Dashboard = () => {
   };  
 
   useEffect(() => {
-    handleDashboardbalance();
+    if(!token) {
+      navigate("/signin");
+    } else {
+      handleDashboardbalance();
+    }
   }, []);
 
   useEffect(() => {
@@ -61,7 +67,7 @@ const Dashboard = () => {
             navigate("/signin")
           }}
           type="button"
-          className="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
+          className="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg hover:cursor-pointer text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
         >
           Log out
         </button>
@@ -70,7 +76,12 @@ const Dashboard = () => {
       <div className="">
         {/* search */}
         <div className="flex items-center justify-between p-6">
+        <div>
           <p className="font-bold text-xl">Your current balance: {balance}</p>
+          <p className="font-light text-gray-600 text-sm">
+            This application is a demonstration project designed to showcase the functionality of secure money transfers. It is not intended for real transactions. Please create multiple account to check the functionality
+          </p>
+        </div>
           <input
             type="text"
             placeholder="Search..."

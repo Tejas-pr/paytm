@@ -109,6 +109,12 @@ const Signup = () => {
           >
             {loading ? "Loading..." : "Sign Up"}
           </button>
+          <p className="mt-4 text-center text-gray-600">
+            Already have an account?{' '}
+            <a href="/signin" className="text-blue-500 hover:underline">
+              Sign In
+            </a>
+          </p>
         </form>
       </div>
     </div>
