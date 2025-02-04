@@ -12,14 +12,22 @@ const accountValid = z.object({
 });
 
 router.get("/balance", authmiddleware, async (req, res) => {
-    const userId = req.userId;
-    const account = await Account.findOne({
-        userId
-    });
+    try {
+        const userId = req.userid;
+        console.log(userId);
 
-    res.json({
-        balance: account.balance
-    })
+        const account = await Account.findOne({ userId });
+
+        if (!account) {
+            return res.status(404).json({ message: "Account not found" });
+        }
+
+        res.json({ balance: account.balance });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
 
 router.post("/transfer", authmiddleware, async (req, res) => {

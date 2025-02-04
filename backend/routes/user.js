@@ -10,8 +10,8 @@ const jwttoken = process.env.JWT_TOKEN;
 const signupBody = zod.object({
     email: zod.string().email(),
     password: zod.string().min(3).max(50),
-    firstName: zod.string().min(3),
-    lastName: zod.string().min(3)
+    firstName: zod.string().min(2),
+    lastName: zod.string().min(1)
 });
 
 const signinBody = zod.object({
