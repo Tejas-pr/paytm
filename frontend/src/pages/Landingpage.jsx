@@ -12,6 +12,7 @@ const LandingPage = () => {
   }, []);
 
   return (
+    // change the landing page to the paytm clone
     <div className="bg-gray-50 min-h-screen">
       {/* Navbar */}
       <nav className="bg-white shadow-sm p-4">
